@@ -31,7 +31,7 @@ prot_seq = 'MDFFRVVENQPPATMPLNVSFTNRNYDLDYDSVQPYFYCDEEENFYQQQQQ' \
 epitope_seq = 'EQKLISEEDL'
 
 # title of plot
-title = 'mBG17 sliding window length 1'
+title = 'Myc 2E2'
 
 # x axis spacing on the generated plot
 tick_len = 20
