@@ -1,2 +1,5 @@
-# PAbFold
-Epitope Prediction Pipeline and analysis tools built around AlphaFold 2
+An initial commit of files that can be changed in the future 
+
+:)
+
+-JD
