@@ -2,4 +2,4 @@ BINDER_SEQ=MDFFRVVENQPPATMPLNVSFTNRNYDLDYDSVQPYFYCDEEENFYQQQQQSELQPPAPSEDIWKKFEL
 
 WINDOW_LEN=2
 
-python /home/jderoo/projects/tagteam/nucleocapsid/B_PeptideMaping_plddt_perres_analysis.py --binder-seq $BINDER_SEQ --window-len $WINDOW_LEN # --all-models
+python B_PeptideMaping_plddt_perres_analysis.py --binder-seq $BINDER_SEQ --window-len $WINDOW_LEN # --all-models
