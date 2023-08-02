@@ -12,8 +12,8 @@ import sys
 parser = argparse.ArgumentParser()
 
 # Add an argument
-parser.add_argument('--dock-against',   type=str,  required=True)
-parser.add_argument('--dock-with',      type=str,  required=True)
+parser.add_argument('--scfv',           type=str,  required=True)
+parser.add_argument('--antigen',        type=str,  required=True)
 parser.add_argument('--peptide-len',    type=int,  required=False, default=10)
 parser.add_argument('--sliding-window', type=int,  required=False, default=2)
 parser.add_argument('--seqs-per-file',  type=int,  required=False, default=10)
@@ -28,8 +28,8 @@ args = parser.parse_args()
 ### EDIT BELOW ###
 ##################
 
-scFv_seq      = args.dock_against
-prot_to_chunk = args.dock_with
+scFv_seq      = args.scfv
+prot_to_chunk = args.antigen
 pep_len       = args.peptide_len
 window_len    = args.sliding_window
 seqs_per_file = args.seqs_per_file
