@@ -8,7 +8,7 @@ import argparse
 parser = argparse.ArgumentParser()
 
 # Add an argument
-parser.add_argument('--binder-seq',  type=str,  required=True)
+parser.add_argument('--antigen',  type=str,  required=True)
 parser.add_argument('--data-dir',    type=str,  required=False, default='sliding_window_split')
 parser.add_argument('--window-len',  type=int,  required=False, default=2)
 parser.add_argument('--all-models',  action="store_true", required=False)#, default=False)
@@ -20,7 +20,7 @@ parser.add_argument('--all-models',  action="store_true", required=False)#, defa
 
 args             = parser.parse_args()
 default_data_dir = args.data_dir
-binder_seq       = args.binder_seq.upper()
+binder_seq       = args.antigen.upper()
 window_len       = args.window_len
 all_models       = args.all_models
 
