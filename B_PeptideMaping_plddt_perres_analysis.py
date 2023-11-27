@@ -4,6 +4,7 @@ import numpy as np
 import sys
 import os
 import argparse
+import shutil
 
 parser = argparse.ArgumentParser()
 
@@ -46,6 +47,26 @@ else:
     my_range = 5
     print('requested all models.')
     
+
+# CDS window function
+def window(sequence, winSize, step=1):
+    """Returns a generator that will iterate through
+    the defined chunks of input sequence.  Input sequence
+    must be iterable."""
+
+    # Verify the inputs
+    if not isinstance(sequence, (list, str, tuple)):
+        raise Exception("**ERROR** sequence must be iterable.")
+    if not (isinstance(winSize, int) and isinstance(step, int)):
+        raise Exception("**ERROR** winSize and step must be of type int.")
+    if step > winSize:
+        raise Exception("**ERROR** step must not be larger than winSize.")
+    if winSize > len(sequence):
+        raise Exception("**ERROR** winSize must not be larger than sequence length.")
+
+    for i in range(0, len(sequence) - winSize + 1, step):
+        yield sequence[i:i+winSize]
+
 
 
 #rank = np.arange(1, num_ranks+1, 1)
@@ -137,11 +158,11 @@ for jd_counter in range(1, my_range+1):
          
         for i in range(len(peptide_seq)):
      
-            if int(all_plddt[batch, pep_num-1, i]) != 0:
-                print('overwriting... uh oh!')
-                sys.exit() 
-            all_plddt[batch, pep_num-1, i]  = plddt[i]
-            all_seq[batch, pep_num-1, i]    = peptide_seq[i]
+            if all_plddt[batch, pep_num-1, i] <= plddt[i]:
+                #print('overwriting... uh oh!')
+                #sys.exit() 
+                all_plddt[batch, pep_num-1, i]  = plddt[i]
+                all_seq[batch, pep_num-1, i]    = peptide_seq[i]
     
     
     #np.save('plddt_matrix.npy', all_plddt)
@@ -246,13 +267,73 @@ for jd_counter in range(1, my_range+1):
     
     idx       = np.where(avg_plddt != 0)[0]
     avg_plddt = avg_plddt[idx]    
+
+
+    # make seqs.py for easy CDS analysis merge
+    seqs_file = open('seqs.py', 'w')
+    PL = len(peptide_seq)
+    slide = window_len 
+    seqlist = [''.join(x) for x in window(binder_seq,PL,slide)]    
+    seqs_file.write("seqs = " + str(seqlist) + '\n')
+    seqs_file.write(f'numaa = {int(len(binder_seq))}')
+    seqs_file.write(f'\nslide = {int(slide)}')
+    seqs_file.write(f'\npeplen = {int(PL)}')
+    seqs_file.close()
+    shutil.move('./seqs.py', '../seqs.py')
+
     
     if all_models == False:    
-        np.save(f'../{jd_counter}_plddt_list.npy', plddt_list)
+        #np.save(f'../{jd_counter}_plddt_list.npy', plddt_list)
         max_plddt = np.max(plddt_list, axis=1)    
         np.save(f'../{jd_counter}_avg_plddt.npy', avg_plddt)
         np.save(f'../{jd_counter}_max_plddt.npy', max_plddt)
-        
+
+        a = plddt_list        
+        z = np.pad(a, ((0,0), (0, 1000)))
+
+        rows, cols = a.shape
+        b = np.zeros(shape=[rows, 1000])
+
+        start = -rows-2
+
+        cnt = 0
+        N = peptide_length_JD
+
+        for i in range(0, rows-N, window_len):
+           top_chunk = z[:i+N, :]
+           bottom_chunk = z[i+N:]#, :-i+1]
+
+           bcp = np.pad(bottom_chunk, ((0,0), (1, 0)))[:, :bottom_chunk.shape[1]]
+           z = np.concatenate([top_chunk, bcp], axis=0)
+           cnt += 1
+           start += 2
+           #print(f'ive run {cnt} times')
+
+           #if i >= 4:
+           #    print(z[:20, :10])
+           #    sys.exit()
+
+        idx = np.where(z[-1,:] != 0)[0][0]
+        d = z[:, :idx+1]
+
+        rows, cols = d.shape
+
+        good_data = np.zeros(shape=[cols, peptide_length_JD])
+        #np.save('good_data.npy', good_data)
+        #print(f'good data shape: {good_data.shape}')
+
+
+        #print(f'my pep length is {N}')
+        for i, pep in enumerate(d.transpose()):
+            idx = np.where(pep != 0)[0]
+            vals = pep[idx]
+            #print(f'loop {i}')
+            #print('values of {vals}')
+            #np.save('good_data.npy', good_data)
+            good_data[i, :] = vals
+        np.save('../max_sliding_window.npy', good_data)
+
+
     else:
         
         ### start paste ###
@@ -324,6 +405,7 @@ for jd_counter in range(1, my_range+1):
         d = z[:, :idx+1]
         
         rows, cols = d.shape
+
                 
         good_data = np.zeros(shape=[cols, peptide_length_JD])
         #np.save('good_data.npy', good_data)
@@ -343,9 +425,7 @@ for jd_counter in range(1, my_range+1):
         if not os.path.exists(f'../rowified_data'):
             os.mkdir(f'../rowified_data')
 
-        if not os.path.exists(f'../rowified_data/{datadir}'):
-            os.mkdir(f'../rowified_data/{datadir}')
-        np.save(f'../rowified_data/{datadir}/model_{jd_counter}_sliding_window_plddt.npy', good_data)
+        np.save(f'../rowified_data/model_{jd_counter}_sliding_window_plddt.npy', good_data)
         ### end paste   ###
         
         
