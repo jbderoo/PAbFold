@@ -7,6 +7,8 @@ Created on Mon Oct 10 18:59:28 2022
 
 import argparse
 import sys
+import numpy as np
+import os
 
 # Create the parser
 parser = argparse.ArgumentParser()
@@ -36,11 +38,6 @@ seqs_per_file = args.seqs_per_file
 demo          = args.demo
 cache         = args.cache
 num_gpus      = args.num_gpus
-#pep_len       = 10   # length of the peptide
-#window_len    = 2    # how far do we slide to generate a new peptide?
-#seqs_per_file = 10   # sequences to write to a single file for AF2
-#demo          = True # is this a demonstration or is this a production run?
-
 
 ##################
 ### EDIT ABOVE ###
@@ -49,7 +46,11 @@ num_gpus      = args.num_gpus
 
 # write a function to keep things pretty
 def write_fasta(all_peptides, N):
-       
+
+    # weird duplication glitch that I can't pinpoint the error in
+    if all_peptides[-1] == all_peptides[-2]:
+        all_peptides = all_peptides[:-1]
+   
     f = open(f'batch_{str(N+1).zfill(3)}.fasta', 'w')
     
     for i, pep in enumerate(all_peptides):
@@ -57,13 +58,7 @@ def write_fasta(all_peptides, N):
         f.write(f'{scFv_seq.upper()}:{pep}\n\n')
         
     f.close()
-    
-        
-    
 
-
-import numpy as np
-import os
 
 # make a new folder to keep things pretty
 
@@ -78,7 +73,6 @@ all_peptides = []
 num_files    = 0
 
 for i in range(len(seq)):
-    
     n = i*window_len
     peptide = seq[n:n+pep_len]
     
@@ -87,11 +81,11 @@ for i in range(len(seq)):
         
         if i == 2:  
             break
-    
+   
+
+
     else: # production run
-    
         all_peptides.append(peptide)
-        
         
         # if we have run out of peptide chunks/slices to make, write current peptides
         if len(peptide) < pep_len:
@@ -116,18 +110,17 @@ for i in range(len(seq)):
                 cache_line = ''
 
 
-
-                # write a 'runit' for every chunk because I am lazy
+            # write a 'runit' for every chunk because I am lazy
             f = open(f'run_batch_{num_files+1}.sh', 'w')
             f.write (f'export CUDA_VISIBLE_DEVICES={device_num}\n' \
                      f'colabfold_batch --templates --num-recycle 6' \
-                     f'{cache_line}' \
-                     f' batch_{str(num_files+1).zfill(3)}.fasta' \
-                     f' output_batch_{str(num_files+1).zfill(3)}')
+                     f'{cache_line} ' \
+                     f'batch_{str(num_files+1).zfill(3)}.fasta ' \
+                     f'output_batch_{str(num_files+1).zfill(3)}')
             f.close ()
                 
  
-            break
+            break # end early when we've reached the end of the sequence - don't repeat end peptide seq twice
         
         else: # still under seqs_per_file peptide per file
             
@@ -153,15 +146,17 @@ for i in range(len(seq)):
                 f = open(f'run_batch_{num_files+1}.sh', 'w')
                 f.write (f'export CUDA_VISIBLE_DEVICES={device_num}\n' \
                          f'colabfold_batch --templates --num-recycle 6' \
-                         f'{cache_line}' \
-                         f' batch_{str(num_files+1).zfill(3)}.fasta' \
-                         f' output_batch_{str(num_files+1).zfill(3)}')
+                         f'{cache_line} ' \
+                         f'batch_{str(num_files+1).zfill(3)}.fasta ' \
+                         f'output_batch_{str(num_files+1).zfill(3)}')
                 f.close ()
                 
                 
                 all_peptides = [] # reset peptides in memory
                 num_files   += 1  # add 1 to number of files written to disk
                 
+#fix weird duplication error
+
 
 # come back to primary directory when all done because some things hate not coming back                
 os.chdir(home)                
