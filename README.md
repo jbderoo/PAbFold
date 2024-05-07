@@ -6,5 +6,5 @@ Requirements:
 - Linux
 - Python 3.9
   - numpy
-
-An antibody sequence should first be converted to a single chain variable fragment (scFv) to drastically reduce the computational requirements (therefore time) needed (__Fig A-B__). 
+- AlphaFold2 (with local colabfold recommended, https://github.com/YoshitakaMo/localcolabfold)
+An antibody sequence should first be converted to a single chain variable fragment (scFv) to drastically reduce the computational requirements (therefore time) needed (__Fig A__).  
