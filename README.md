@@ -11,12 +11,7 @@ Requirements:
 
 An antibody sequence should first be converted to a single chain variable fragment (scFv) to drastically reduce the computational requirements (therefore time) needed (__Fig A__). For assistance on this, please see the scFv-ification repo (coming soon!). The script `A_PeptideMaping_prep_submission_files.py` creates a fasta file of several sequences, where we chop up the antigen sequence (__Fig B__) into several subsequences such that we can test every individual epitope of a specificied length (Figure example: 10) and sliding window (Figure example: 1). Afterwards every sequence is then paired with the scFv sequence in a fasta file for folding. Here is a toy example of the output fasta file, that has the chopped up antigen sequence paired to the scFv sequence:
 
-`>batch_1_peptide_1\`
-`scFv_sequence:ABCDEFGHIJ\\`
+```>batch_1_peptide_1\
+scFv_sequence:ABCDEFGHIJ\\```
 
-`>batch_1_peptide_1\`
-`scFv_sequence:ABCDEFGHIJ\\`
-
-`>batch_1_peptide_1\`
-`scFv_sequence:ABCDEFGHIJ\\`
 
