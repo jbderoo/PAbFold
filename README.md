@@ -22,3 +22,4 @@ scFv_sequence:CDEFGHIJKL
 scFv_sequence:EFGHIJKLMN
 ```
 
+After all these structures are predicted, we can use the pLDDT (https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3799472/) metric to assess how well the epitope binds into the CDR loops of the scFv. We can plot the sliding window pLDDT and per residue max pLDDT (__Fig C__) to identify regions in the antigen that may bind well with the provided scFv. 
