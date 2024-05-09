@@ -14,6 +14,11 @@ An antibody sequence should first be converted to a single chain variable fragme
 ```
 >batch_1_peptide_1
 scFv_sequence:ABCDEFGHIJ
-```
 
+>batch_1_peptide_2
+scFv_sequence:CDEFGHIJKL
+
+>batch_1_peptide_3
+scFv_sequence:EFGHIJKLMN
+```
 
